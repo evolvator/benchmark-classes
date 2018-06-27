@@ -59,15 +59,22 @@ async.timesSeries(
     (function() {
       if (t) {
         var prototype = functions[t - 1].i;
-        suite.add('function', function() {
+        suite.add('create function', function() {
           function F() {};
           F.prototype = prototype;
         });
       } else {
-        suite.add('function', function() {
+        suite.add('create function', function() {
           function F() {};
         });
       }
+    })();
+    
+    (function() {
+      var F = functions[t].f;
+      suite.add('new function', function() {
+        new F();
+      });
     })();
     
     (function() {
@@ -81,6 +88,13 @@ async.timesSeries(
           class C {};
         });
       }
+    })();
+    
+    (function() {
+      var F = classesEs15[t].f;
+      suite.add('new class', function() {
+        new F();
+      });
     })();
     
     (function() {
@@ -103,6 +117,13 @@ async.timesSeries(
           }());
         });
       }
+    })();
+    
+    (function() {
+      var F = classesTs[t].f;
+      suite.add('new ts class', function() {
+        new F();
+      });
     })();
     
     tb.wrapSuite(suite, () => next());
