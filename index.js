@@ -1,222 +1,111 @@
+'use strict';
+
 var Benchmark = require('benchmark');
 var tb = require('travis-benchmark');
+var async = require('async');
 var _ = require('lodash');
 var global = require('global');
 
-var suite = new Benchmark.Suite(`variables scope`);
-
-(function() {
-  var a = {
-    c: 123,
-    b: function() {
-      this.c;
-    }
+// typescript
+var __extends = (this && this.__extends) || (function () {
+  var extendStatics = Object.setPrototypeOf ||
+      ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+      function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+  return function (d, b) {
+      extendStatics(d, b);
+      function __() { this.constructor = d; }
+      d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
   };
-  suite.add('object this', function() {
-    return a.b();
-  });
 })();
 
-(function() {
-  var x;
-  global.y = 123;
-  x = function() {
-    return this.y;
-  };
-  suite.add('global this', function() {
-    return x();
-  });
-})();
+var functions = {};
+var classesEs15 = {};
+var classesTs = {};
 
-(function() {
-  var x, y = 123;
-  x = function() {
-    return y;
-  };
-  suite.add('scope 1', function() {
-    x();
-  });
-})();
+for (var i = 0; i < 9; i++) {
+  functions[i] = {};
+  functions[i].f = function() {};
+  if (i) functions[i].f.prototype = functions[i - 1].i;
+  functions[i].i = new functions[i].f();
+  
+  classesEs15[i] = {};
+  if (i) classesEs15[i].f = class extends classesEs15[i - 1].f {};
+  else classesEs15[i].f = class {};
+  classesEs15[i].i = new classesEs15[i].f();
+  
+  classesTs[i] = {};
+  if (i) {
+    classesTs[i].f = /** @class */ (function (_super) {
+      __extends(С, _super);
+      function С() {
+        return _super !== null && _super.apply(this, arguments) || this;
+      }
+      return С;
+    }(classesTs[i - 1].f));
+  } else {
+    classesTs[i].f = /** @class */ (function () {
+      function С() {}
+      return С;
+    }());
+  }
+  classesTs[i].i = new classesTs[i].f();
+}
 
-(function() {
-  var x, y = 123;;
-  (function() {
-    x = function() {
-      return y;
-    };
-  })();
-  suite.add('scope 2', function() {
-    x();
-  });
-})();
-
-(function() {
-  var x, y = 123;;
-  (function() {
+async.timesSeries(
+  10,
+  function(t, next) {
+    var suite = new Benchmark.Suite(`x${t}`);
+    
     (function() {
-      x = function() {
-        return y;
-      };
+      if (t) {
+        var prototype = functions[t - 1].i;
+        suite.add('function', function() {
+          function F() {};
+          F.prototype = prototype;
+        });
+      } else {
+        suite.add('function', function() {
+          function F() {};
+        });
+      }
     })();
-  })();
-  suite.add('scope 3', function() {
-    x();
-  });
-})();
-
-(function() {
-  var x, y = 123;;
-  (function() {
+    
     (function() {
-      (function() {
-        x = function() {
-          return y;
-        };
-      })();
+      if (t) {
+        var F = classesEs15[t - 1].f;
+        suite.add('es15 class', function() {
+          class C extends F {};
+        });
+      } else {
+        suite.add('es15 class', function() {
+          class C {};
+        });
+      }
     })();
-  })();
-  suite.add('scope 4', function() {
-    x();
-  });
-})();
-
-(function() {
-  var x, y = 123;;
-  (function() {
+    
     (function() {
-      (function() {
-        (function() {
-          x = function() {
-            return y;
-          };
-        })();
-      })();
+      if (t) {
+        var F = classesTs[t - 1].f;
+        suite.add('ts class', function() {
+          (function (_super) {
+            __extends(С, _super);
+            function С() {
+              return _super !== null && _super.apply(this, arguments) || this;
+            }
+            return С;
+          }(F));
+        });
+      } else {
+        suite.add('ts class', function() {
+          (function () {
+            function С() {}
+            return С;
+          }());
+        });
+      }
     })();
-  })();
-  suite.add('scope 5', function() {
-    x();
-  });
-})();
-
-(function() {
-  var x, y = 123;;
-  (function() {
-    (function() {
-      (function() {
-        (function() {
-          (function() {
-            x = function() {
-              return y;
-            };
-          })();
-        })();
-      })();
-    })();
-  })();
-  suite.add('scope 6', function() {
-    x();
-  });
-})();
-
-(function() {
-  var x, y = 123;;
-  (function() {
-    (function() {
-      (function() {
-        (function() {
-          (function() {
-            (function() {
-              x = function() {
-                return y;
-              };
-            })();
-          })();
-        })();
-      })();
-    })();
-  })();
-  suite.add('scope 7', function() {
-    x();
-  });
-})();
-
-(function() {
-  var x, y = 123;;
-  (function() {
-    (function() {
-      (function() {
-        (function() {
-          (function() {
-            (function() {
-              (function() {
-                x = function() {
-                  return y;
-                };
-              })();
-            })();
-          })();
-        })();
-      })();
-    })();
-  })();
-  suite.add('scope 8', function() {
-    x();
-  });
-})();
-
-(function() {
-  var x, y = 123;;
-  (function() {
-    (function() {
-      (function() {
-        (function() {
-          (function() {
-            (function() {
-              (function() {
-                (function() {
-                  x = function() {
-                    return y;
-                  };
-                })();
-              })();
-            })();
-          })();
-        })();
-      })();
-    })();
-  })();
-  suite.add('scope 9', function() {
-    x();
-  });
-})();
-
-(function() {
-  var x, y = 123;;
-  (function() {
-    (function() {
-      (function() {
-        (function() {
-          (function() {
-            (function() {
-              (function() {
-                (function() {
-                  (function() {
-                    x = function() {
-                      return y;
-                    };
-                  })();
-                })();
-              })();
-            })();
-          })();
-        })();
-      })();
-    })();
-  })();
-  suite.add('scope 10', function() {
-    x();
-  });
-})();
-
-tb.wrapSuite(suite);
-suite.run({ async: true });
+    
+    tb.wrapSuite(suite, () => next());
+    suite.run({ async: true });
+  }
+);
