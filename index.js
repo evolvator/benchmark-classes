@@ -5,6 +5,8 @@ var tb = require('travis-benchmark');
 var async = require('async');
 var _ = require('lodash');
 var global = require('global');
+var klass = require('klass');
+var class1 = require('class');
 
 // typescript
 var __extends = (this && this.__extends) || (function () {
@@ -19,20 +21,22 @@ var __extends = (this && this.__extends) || (function () {
 })();
 
 var functions = {};
-var classesEs15 = {};
-var classesTs = {};
-
 for (var i = 0; i < 9; i++) {
   functions[i] = {};
   functions[i].f = function() {};
   if (i) functions[i].f.prototype = functions[i - 1].i;
   functions[i].i = new functions[i].f();
-  
+}
+
+var classesEs15 = {};
+for (var i = 0; i < 9; i++) {
   classesEs15[i] = {};
   if (i) classesEs15[i].f = class extends classesEs15[i - 1].f {};
   else classesEs15[i].f = class {};
-  classesEs15[i].i = new classesEs15[i].f();
-  
+}
+
+var classesTs = {};
+for (var i = 0; i < 9; i++) {
   classesTs[i] = {};
   if (i) {
     classesTs[i].f = /** @class */ (function (_super) {
@@ -48,7 +52,20 @@ for (var i = 0; i < 9; i++) {
       return С;
     }());
   }
-  classesTs[i].i = new classesTs[i].f();
+}
+
+var klasses = {};
+for (var i = 0; i < 9; i++) {
+  klasses[i] = {};
+  if (i) klasses[i].f = klasses[i - 1].f.extend(function() {});
+  else klasses[i].f = klass(function() {});
+}
+
+var classes1 = {};
+for (var i = 0; i < 9; i++) {
+  classes1[i] = {};
+  if (i) classes1[i].f = classes1[i - 1].f.subclass(function() {});
+  else classes1[i].f = class1.new(function() {});
 }
 
 async.timesSeries(
@@ -80,11 +97,11 @@ async.timesSeries(
     (function() {
       if (t) {
         var F = classesEs15[t - 1].f;
-        suite.add('es15 class', function() {
+        suite.add('create es15 class', function() {
           class C extends F {};
         });
       } else {
-        suite.add('es15 class', function() {
+        suite.add('create es15 class', function() {
           class C {};
         });
       }
@@ -92,7 +109,7 @@ async.timesSeries(
     
     (function() {
       var F = classesEs15[t].f;
-      suite.add('new class', function() {
+      suite.add('new es15 class', function() {
         new F();
       });
     })();
@@ -100,7 +117,7 @@ async.timesSeries(
     (function() {
       if (t) {
         var F = classesTs[t - 1].f;
-        suite.add('ts class', function() {
+        suite.add('create ts class', function() {
           (function (_super) {
             __extends(С, _super);
             function С() {
@@ -110,7 +127,7 @@ async.timesSeries(
           }(F));
         });
       } else {
-        suite.add('ts class', function() {
+        suite.add('create ts class', function() {
           (function () {
             function С() {}
             return С;
@@ -123,6 +140,46 @@ async.timesSeries(
       var F = classesTs[t].f;
       suite.add('new ts class', function() {
         new F();
+      });
+    })();
+    
+    (function() {
+      if (t) {
+        var F = klasses[t - 1].f;
+        suite.add('create klass@1.4.1 class', function() {
+          F.extend(function() {});
+        });
+      } else {
+        suite.add('create klass@1.4.1 class', function() {
+          klass(function() {});
+        });
+      }
+    })();
+    
+    (function() {
+      var F = klasses[t].f;
+      suite.add('new klass@1.4.1', function() {
+        new F();
+      });
+    })();
+    
+    (function() {
+      if (t) {
+        var F = classes1[t - 1].f;
+        suite.add('create class@0.1.4 class', function() {
+          F.subclass(function() {});
+        });
+      } else {
+        suite.add('create class@0.1.4 class', function() {
+          class1.new(function() {});
+        });
+      }
+    })();
+    
+    (function() {
+      var F = classes1[t].f;
+      suite.add('new class@0.1.4', function() {
+        F.new();
       });
     })();
     
