@@ -6,7 +6,6 @@ var async = require('async');
 var _ = require('lodash');
 var global = require('global');
 var klass = require('klass');
-var class1 = require('class');
 
 // typescript
 var __extends = (this && this.__extends) || (function () {
@@ -59,13 +58,6 @@ for (var i = 0; i < 9; i++) {
   klasses[i] = {};
   if (i) klasses[i].f = klasses[i - 1].f.extend(function() {});
   else klasses[i].f = klass(function() {});
-}
-
-var classes1 = {};
-for (var i = 0; i < 9; i++) {
-  classes1[i] = {};
-  if (i) classes1[i].f = classes1[i - 1].f.subclass(function() {});
-  else classes1[i].f = class1.new(function() {});
 }
 
 async.timesSeries(
@@ -160,26 +152,6 @@ async.timesSeries(
       var F = klasses[t].f;
       suite.add('new klass@1.4.1', function() {
         new F();
-      });
-    })();
-    
-    (function() {
-      if (t) {
-        var F = classes1[t - 1].f;
-        suite.add('create class@0.1.4 class', function() {
-          F.subclass(function() {});
-        });
-      } else {
-        suite.add('create class@0.1.4 class', function() {
-          class1.new(function() {});
-        });
-      }
-    })();
-    
-    (function() {
-      var F = classes1[t].f;
-      suite.add('new class@0.1.4', function() {
-        F.new();
       });
     })();
     
