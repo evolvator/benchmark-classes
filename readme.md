@@ -2,7 +2,7 @@
 
 What is the difference in speed between class engines?
 
-[![Build Status](https://travis-ci.org/evolvator/benchmark-classes.svg?branch=master)](https://travis-ci.org/evolvator/benchmark-classes)
+[![Build Status](https://travis-ci.org/evolvator/benchmark-classes.svg?branch=code)](https://travis-ci.org/evolvator/benchmark-classes)
 
 [Executable code](https://github.com/evolvator/benchmark-classes/tree/code)
 
